@@ -112,6 +112,11 @@ class CoolBot(object):
             self._processmsg(self._lines.pop(0))
 
     @connected
+    def all(self, channels):
+        for channel in channels:
+            self._sendmsg('NAMES', channel)
+
+    @connected
     def join(self, channel):
         self._sendmsg('JOIN', channel)
 
