@@ -86,6 +86,7 @@ class CoolBot(object):
 
     def __init__(self, host, port, nick, name, channel):
         self._cmds = {
+            '!!all' : self.all,
             '!!say' : self.say,
             '!!help' : self.help,
             '!!die' : self.die,
