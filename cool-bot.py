@@ -122,7 +122,7 @@ class CoolBot(object):
     @connected
     def say(self, channels, msg):
         for channel in channels:
-            self._sendmsg('PRIVMSG', channel, ':', msg)
+            self._sendmsg('PRIVMSG', channel, ':' + msg)
 
     @connected
     def help(self, channels, msg = ""):
@@ -131,7 +131,7 @@ class CoolBot(object):
     @connected
     def leave(self, channels, msg):
         for channel in channels:
-            self._sendmsg('PART', channel, ':', 'You told me to go.')
+            self._sendmsg('PART', channel, ':You told me to go.')
 
     @connected
     def join(self, channels = '#hackerscool'):
