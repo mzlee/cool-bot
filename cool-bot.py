@@ -22,6 +22,12 @@ def connected(fn):
                 self.die(str(err))
     return deco
 
+def command(fn):
+    def deco(self, *args, **kwargs):
+        print fn.__name__
+        fn(*args, **kwargs)
+    return deco
+
 class CoolBot(object):
 
     _sock = None
@@ -114,6 +120,7 @@ class CoolBot(object):
             self._processmsg(self._lines.pop(0))
 
     @connected
+    @command
     def all(self, channels):
         for channel in channels:
             self._sendmsg('NAMES', channel)
