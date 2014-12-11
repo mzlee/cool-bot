@@ -146,7 +146,7 @@ class CoolBot(object):
 
     @connected
     def pong(self):
-        self._sendmsg('PONG')
+        self._sendmsg('PONG localhost.')
 
     def connected(self):
         return self._sock != None
