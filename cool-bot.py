@@ -1,8 +1,9 @@
 #!/usr/bin/env/ python
 import os
-import sys
-import string
+import random
 import socket
+import string
+import sys
 
 HOST='0.0.0.0'
 PORT=6667
@@ -58,8 +59,12 @@ class CoolBot(object):
     def _processcmd(self, user, channels, raw):
         if not raw.startswith('!!'):
             cmd = raw.split()[0].lower()
-            if cmd in ['hi', 'hello', 'sup', 'hey']:
-                self.hello(channels, user.split('!')[0])
+            if cmd in self._knowledge:
+                user = user.split('!', 1)[0]
+                phrase = random.choice(self._knowledge[cmd])
+                if phrase.find('%s') >= 0:
+                    phrase = phrase % user
+                self.say(channels, '%s' % phrase)
             return
 
         cmd, msg = raw.lower(), ""
@@ -93,7 +98,15 @@ class CoolBot(object):
             '!!help'  : self.help,
             '!!leave' : self.leave,
             '!!join'  : self.join,
+            '!!learn' : self.learn,
         }
+        self._knowledge = {}
+        with file("cool-bot.dict", 'r') as knowledge:
+            for line in knowledge.readlines():
+                key, val = [s.strip() for s in line.split(':', 1)]
+                if key not in self._knowledge:
+                    self._knowledge[key] = list()
+                self._knowledge[key].append(val)
         self._nick = nick
         self.__connect__(host, port)
         self.__identify__(nick, name)
@@ -130,22 +143,27 @@ class CoolBot(object):
                 continue
             ## This is NAMES message
             ## :localhost. 353 cool-bot = #cool-bot :cool-bot @root
-            cmd, msg = line[1:].split(':', 1)
+            cmd, targets = line[1:].split(':', 1)
             targets = filter(
                 lambda nick: nick != self._nick,
-                [msg.split()]
+                targets.split()
             )
             channel = cmd.split()[-1].strip()
-            self.say([channel], ', '.join(targets) + ':', msg)
+            self.say([channel ], ', '.join(targets) + ':', msg)
         self._buffermsg('\n'.join(new_lines))
 
     @connected
     def join(self, channel):
         self._sendmsg('JOIN', channel)
 
-    @connected
-    def hello(self, channels, user):
-        self.say(channels, 'Hi ' + user)
+    def learn(self, channels, msg):
+        try:
+            key, val = msg.lower().split(None, 1)
+            if key not in self._knowledge:
+                self._knowledge[key] = list()
+            self._knowledge[key].append(val)
+        except:
+            self.say(channels, "I can't understand what you're trying to teach me...")
 
     @connected
     def say(self, channels, msg, *args):
@@ -173,6 +191,11 @@ class CoolBot(object):
         self._sendmsg('QUIT :%s' % msg)
         self._sock.close()
         self._sock = None
+        ## Flush out the dictionary
+        with file("cool-bot.dict", 'w') as knowledge:
+            for k, vals in self._knowledge.iteritems():
+                for v in vals:
+                    knowledge.write("%s:%s\n" % (k, v))
 
     @connected
     def pong(self):
