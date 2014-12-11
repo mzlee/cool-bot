@@ -19,7 +19,7 @@ def connected(fn):
             self._sock = None
         except Exception, err:
             if self._sock:
-                self.die()
+                self.die(str(err))
     return deco
 
 class CoolBot(object):
@@ -140,7 +140,9 @@ class CoolBot(object):
 
     @connected
     def die(self, channel = "", msg = ""):
-        self._sendmsg('QUIT')
+        if not msg:
+            msg = "cool-bot out"
+        self._sendmsg('QUIT :%s', msg)
         self._sock.close()
         self._sock = None
 
