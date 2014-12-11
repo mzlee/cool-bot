@@ -130,14 +130,13 @@ class CoolBot(object):
                 continue
             ## This is NAMES message
             ## :localhost. 353 cool-bot = #cool-bot :cool-bot @root
+            cmd, msg = line[1:].split(':', 1)
             targets = filter(
                 lambda nick: nick != self._nick,
-                [
-                    t if not t.startswith('@') else t[1:]
-                    for t in line[1:].split(':', 1)[1].split()
-                ]
+                [msg.split()]
             )
-            self.say(channels, ', '.join(targets) + ':', msg)
+            channel = cmd.split()[-1].strip()
+            self.say([channel], ', '.join(targets) + ':', msg)
         self._buffermsg('\n'.join(new_lines))
 
     @connected
