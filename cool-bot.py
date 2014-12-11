@@ -126,8 +126,7 @@ class CoolBot(object):
 
     @connected
     def say(self, channels, msg):
-        for channel in channels:
-            self._sendmsg('PRIVMSG', channel, ':' + msg)
+        self._sendmsg('PRIVMSG', ','.join(channel), ':' + msg)
 
     @connected
     def help(self, channels, msg = ""):
