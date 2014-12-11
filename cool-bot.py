@@ -148,7 +148,7 @@ class CoolBot(object):
     def die(self, channel = "", msg = ""):
         if not msg:
             msg = "cool-bot out"
-        self._sendmsg('QUIT :%s', msg)
+        self._sendmsg('QUIT :%s' % msg)
         self._sock.close()
         self._sock = None
 
