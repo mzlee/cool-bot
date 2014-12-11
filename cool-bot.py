@@ -28,6 +28,7 @@ class CoolBot(object):
     _lines = [""]
 
     def _sendmsg(self, cmd, *args):
+        print "SENDING: %s" % ("%s %s" % (cmd, ' '.join(args)))
         self._sock.send("%s %s\n" % (cmd, ' '.join(args)))
 
     def _buffermsg(self, data):
@@ -93,6 +94,7 @@ class CoolBot(object):
             '!!die' : self.die,
             '!!leave' : self.leave,
         }
+        self._nick = nick
         self.__connect__(host, port)
         self.__identify__(nick, name)
         self.join([channel])
@@ -116,6 +118,27 @@ class CoolBot(object):
     @connected
     def all(self, channels, msg = ""):
         self._sendmsg('NAMES', ','.join(channels))
+        if msg == "":
+            msg = "Hey!"
+        ## Immediately receive
+        lines = self._sock.recv(512).split('\n')
+        new_lines = []
+        for line in lines:
+            chunks = line.split()
+            if '353' not in chunks:
+                new_lines.append(line)
+                continue
+            ## This is NAMES message
+            ## :localhost. 353 cool-bot = #cool-bot :cool-bot @root
+            targets = filter(
+                lambda nick: nick != self._nick,
+                [
+                    t if not t.startswith('@') else t[1:]
+                    for t in line[1:].split(':', 1)[1].split()
+                ]
+            )
+            self.say(channels, ', '.join(targets) + ':', msg)
+        self._buffermsg('\n'.join(new_lines))
 
     @connected
     def join(self, channel):
