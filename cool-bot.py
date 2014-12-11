@@ -28,7 +28,6 @@ class CoolBot(object):
     _lines = [""]
 
     def _sendmsg(self, cmd, *args):
-        print "SENDING: %s" % ("%s %s" % (cmd, ' '.join(args)))
         self._sock.send("%s %s\n" % (cmd, ' '.join(args)))
 
     def _buffermsg(self, data):
