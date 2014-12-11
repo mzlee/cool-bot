@@ -56,6 +56,9 @@ class CoolBot(object):
 
     def _processcmd(self, user, channels, raw):
         if not raw.startswith('!!'):
+            cmd = raw.split()[0].lower()
+            if cmd in ['hi', 'hello', 'sup', 'hey']:
+                self.hello(channels, user.split('!')[0])
             return
 
         msg = raw.lower()
@@ -75,8 +78,6 @@ class CoolBot(object):
 
         if cmd in self._cmds:
             self._cmds[cmd](channels, msg)
-        elif cmd in ['!!hi', '!!hello', '!!sup']:
-            self.hello(channels, user)
         elif cmd in ['!!part']:
             self.leave(channels, msg)
         elif cmd in ['!!quit', '!!exit', '!!die']:
