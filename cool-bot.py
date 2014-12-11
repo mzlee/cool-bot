@@ -17,6 +17,9 @@ def connected(fn):
         except socket.error, err:
             ## Removing the socket
             self._sock = None
+        except Exception, err:
+            if self._sock:
+                self.die()
     return deco
 
 class CoolBot(object):
@@ -76,7 +79,7 @@ class CoolBot(object):
         elif cmd in ['!!hi', '!!hello', '!!sup']:
             self.hello(channels, user)
         elif cmd in ['!!part']:
-            self.leave(channels)
+            self.leave(channels, msg)
         elif cmd in ['!!quit', '!!exit', '!!die']:
             self.die()
         elif cmd in ['!!join']:
