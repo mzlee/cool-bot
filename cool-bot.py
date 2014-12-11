@@ -88,11 +88,11 @@ class CoolBot(object):
 
     def __init__(self, host, port, nick, name, channel):
         self._cmds = {
-            '!!all' : self.all,
-            '!!say' : self.say,
-            '!!help' : self.help,
-            '!!die' : self.die,
+            '!!all'   : self.all,
+            '!!say'   : self.say,
+            '!!help'  : self.help,
             '!!leave' : self.leave,
+            '!!join'  : self.join,
         }
         self._nick = nick
         self.__connect__(host, port)
@@ -154,7 +154,7 @@ class CoolBot(object):
 
     @connected
     def help(self, channels, msg = ""):
-        self.say(channels, ', '.join(self._cmds.keys()))
+        self.say(channels, ', '.join(sorted(self._cmds.keys())))
 
     @connected
     def leave(self, channels, msg):
@@ -162,7 +162,7 @@ class CoolBot(object):
             self._sendmsg('PART', channel, ':You told me to go.')
 
     @connected
-    def join(self, channels = '#hackerscool'):
+    def join(self, channels = ['#hackerscool'], msg = ""):
         for channel in channels:
             self._sendmsg('JOIN', channel)
 
