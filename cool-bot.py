@@ -52,7 +52,7 @@ class CoolBot(object):
             channel = cmd.split()[1]
             self._processcmd(user, [channel, ], msg)
 
-    def _processcmd(self, user, channel, raw):
+    def _processcmd(self, user, channels, raw):
         if not raw.startswith('!!'):
             return
 
@@ -65,16 +65,18 @@ class CoolBot(object):
         chunks = msg.split()
         targets = filter(lambda s: s.startswith('@'), chunks)
         for target in targets:
-            channel.append(target[1:])
+            channels.append(target[1:])
             msg = msg[0:msg.find(target)] + msg[msg.find(target) + len(target) + 1:]
-        channel = list(set(channel))
+        channels = list(set(channels))
+        if 'cool-bot' in channels:
+            channels.remove('cool-bot')
 
         if cmd in self._cmds:
-            self._cmds[cmd](channel, msg)
+            self._cmds[cmd](channels, msg)
         elif cmd in ['!!hi', '!!hello', '!!sup']:
-            self.hello(channel, user)
+            self.hello(channels, user)
         elif cmd in ['!!part']:
-            self.leave(channel)
+            self.leave(channels)
         elif cmd in ['!!quit', '!!exit', '!!die']:
             self.die()
         elif cmd in ['!!join']:
