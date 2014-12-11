@@ -61,11 +61,11 @@ class CoolBot(object):
                 self.hello(channels, user.split('!')[0])
             return
 
-        msg = raw.lower()
+        cmd, msg = raw.lower(), ""
         try:
-            cmd, msg = msg.split(None, 1)
+            cmd, msg = cmd.split(None, 1)
         except:
-            cmd = msg
+            pass
 
         chunks = msg.split()
         targets = filter(lambda s: s.startswith('@'), chunks)
@@ -81,7 +81,7 @@ class CoolBot(object):
         elif cmd in ['!!part']:
             self.leave(channels, msg)
         elif cmd in ['!!quit', '!!exit', '!!die']:
-            self.die()
+            self.die(msg = msg)
         elif cmd in ['!!join']:
             self.join([msg])
 
@@ -126,8 +126,9 @@ class CoolBot(object):
         self.say(channels, 'Hi ' + user)
 
     @connected
-    def say(self, channels, msg):
-        self._sendmsg('PRIVMSG', ','.join(channel), ':' + msg)
+    def say(self, channels, msg, *args):
+        msg = ':' + msg
+        self._sendmsg('PRIVMSG', ','.join(channels), msg, *args)
 
     @connected
     def help(self, channels, msg = ""):
