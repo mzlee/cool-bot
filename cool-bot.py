@@ -112,8 +112,8 @@ class CoolBot(object):
         self._sendmsg('JOIN', channel)
 
     @connected
-    def hello(self, channel, user):
-        self._sendmsg('PRIVMSG', channel, ':', 'Hi', user)
+    def hello(self, channels, user):
+        self.say(channels, 'Hi ' + user)
 
     @connected
     def say(self, channels, msg):
