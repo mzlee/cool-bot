@@ -29,7 +29,7 @@ class CoolBot(object):
     _lines = [""]
 
     def _sendmsg(self, cmd, *args):
-        print "SENDING: %s" % ("%s %s" % (cmd, ' '.join(args)))
+        # print "SENDING: %s" % ("%s %s" % (cmd, ' '.join(args)))
         self._sock.send("%s %s\n" % (cmd, ' '.join(args)))
 
     def _buffermsg(self, data):
@@ -38,10 +38,10 @@ class CoolBot(object):
         self._lines.extend(lines[1:])
 
     def _processmsg(self, line):
-        print line
         if line.startswith('PING'):
             self.pong()
             return
+        print line
         line = line[1:]
         if line.find(':') == -1:
             return
