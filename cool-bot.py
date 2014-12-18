@@ -56,16 +56,25 @@ class CoolBot(object):
             channel = cmd.split()[1]
             self._processcmd(user, [channel, ], msg)
 
+    def _checkKnowledge(self, user, channels, raw):
+        chunks = raw.lower().split()
+        cmd = chunks[0]
+
+        if 'cool-bot' not in chunks and len(chunks) != 1:
+            return False
+
+        if cmd in self._knowledge:
+            user = user.split('!', 1)[0]
+            phrase = random.choice(self._knowledge[cmd])
+            if phrase.find('%s') >= 0:
+                phrase = phrase % user
+            self.say(channels, '%s' % phrase)
+            return True
+        return False
+
     def _processcmd(self, user, channels, raw):
         if not raw.startswith('!!'):
-            cmd = raw.split()[0].lower()
-            if cmd in self._knowledge:
-                user = user.split('!', 1)[0]
-                phrase = random.choice(self._knowledge[cmd])
-                if phrase.find('%s') >= 0:
-                    phrase = phrase % user
-                self.say(channels, '%s' % phrase)
-            return
+            return self._checkKnowledge(user, channels, raw)
 
         cmd, msg = raw.lower(), ""
         try:
@@ -99,6 +108,7 @@ class CoolBot(object):
             '!!leave' : self.leave,
             '!!join'  : self.join,
             '!!learn' : self.learn,
+            '!!list'  : self.list,
         }
         self._knowledge = {}
         with file("cool-bot.dict", 'r') as knowledge:
@@ -156,6 +166,7 @@ class CoolBot(object):
     def join(self, channel):
         self._sendmsg('JOIN', channel)
 
+    @connected
     def learn(self, channels, msg):
         try:
             key, val = msg.lower().split(None, 1)
@@ -164,6 +175,15 @@ class CoolBot(object):
             self._knowledge[key].append(val)
         except:
             self.say(channels, "I can't understand what you're trying to teach me...")
+
+    @connected
+    def list(self, channels, msg):
+        keys = msg.lower().split()
+        if not keys:
+            keys = self._knowledge.keys()
+        for key in sorted(keys):
+            if key in self._knowledge:
+                self.say(channels, '%s: %s' % (key, ', '.join(self._knowledge[key])))
 
     @connected
     def say(self, channels, msg, *args):
